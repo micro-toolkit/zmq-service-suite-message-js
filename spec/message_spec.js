@@ -55,4 +55,28 @@ describe('Message', function() {
       expect(actual.payload).toEqual(payload);
     });
   });
+
+  describe("#toString", function(){
+    it('return formated string', function(){
+      var frames = [
+        "identity",
+        "ZSS:0.0",
+        "REP",
+        msgpack.encode(address),
+        msgpack.encode(headers),
+        200,
+        msgpack.encode("payload")
+      ];
+
+      var formated = Message.parse(frames).toString();
+      var expected = '********\nFRAME 0: identity\n';
+      expected += 'FRAME 1: ZSS:0.0\n';
+      expected += 'FRAME 2: REP\n';
+      expected += 'FRAME 3: {"sid":"service-id","sversion":"service-version","verb":"verb"}\n';
+      expected += 'FRAME 4: {"X-REQ-ID":"request-id","X-RUNTIME":800}\n';
+      expected += 'FRAME 5: 200\n';
+      expected += 'FRAME 6: "payload"\n********';
+      expect(formated).toEqual(expected);
+    });
+  });
 });
