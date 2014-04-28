@@ -79,4 +79,29 @@ describe('Message', function() {
       expect(formated).toEqual(expected);
     });
   });
+
+  describe('#toFrames', function(){
+    it('returns the message frames', function(){
+      var frames = [
+        "identity",
+        "ZSS:0.0",
+        "REP",
+        msgpack.encode(address),
+        msgpack.encode(headers),
+        200,
+        msgpack.encode("payload")
+      ];
+
+      var actual = Message.parse(frames).toFrames();
+
+      expect(actual).toBeDefined();
+      expect(actual[0]).toEqual(frames[0]);
+      expect(actual[1]).toEqual(frames[1]);
+      expect(actual[2]).toEqual(frames[2]);
+      expect(msgpack.decode(actual[3])).toEqual(msgpack.decode(frames[3]));
+      expect(msgpack.decode(actual[4])).toEqual(msgpack.decode(frames[4]));
+      expect(actual[5]).toEqual(frames[5]);
+      expect(msgpack.decode(actual[6])).toEqual(msgpack.decode(frames[6]));
+    });
+  });
 });
