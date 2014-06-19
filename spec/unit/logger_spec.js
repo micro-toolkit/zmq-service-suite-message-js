@@ -1,5 +1,5 @@
 describe('Logger', function() {
-  var log = require('../lib/logger');
+  var log = require('../../lib/logger');
 
   it('trace level outputs log into console.log', function(){
     spyOn(console, 'log');
