@@ -2,15 +2,19 @@ describe('Message', function() {
   var Message = require('../../lib/message');
   var msgpack = require('msgpack-js');
 
-  var address = {
-    sid: "service-id",
-    sversion: "service-version",
-    verb: "verb"
-  };
-  var headers = {
-    "X-REQ-ID": "request-id",
-    "X-RUNTIME": 800
-  };
+  var address, headers;
+
+  beforeEach(function(){
+    address = {
+      sid: "service-id",
+      sversion: "service-version",
+      verb: "verb"
+    };
+    headers = {
+      "X-REQ-ID": "request-id",
+      "X-RUNTIME": 800
+    };
+  });
 
   describe('#parse', function(){
     it('returns a fullfilled message', function(){
@@ -54,6 +58,12 @@ describe('Message', function() {
       expect(actual.headers).toEqual(null);
       expect(actual.status).toEqual(null);
       expect(actual.payload).toEqual(null);
+    });
+
+    it('returns a fullfilled message with default service version', function(){
+      address.sversion = '*';
+      var actual = new Message(address.sid, address.verb);
+      expect(actual.address).toEqual(address);
     });
   });
 
