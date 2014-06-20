@@ -48,7 +48,7 @@ describe('Message', function() {
         payload, headers, 200);
 
       expect(actual).toBeDefined();
-      expect(actual.identity).toBeDefined();
+      expect(actual.identity).toBeNull();
       expect(actual.protocol).toEqual("ZSS:0.0");
       expect(actual.type).toEqual("REQ");
       expect(actual.address).toEqual(address);
