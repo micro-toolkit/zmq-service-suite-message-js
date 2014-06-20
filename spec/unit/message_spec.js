@@ -44,17 +44,16 @@ describe('Message', function() {
     it('returns a fullfilled message', function(){
       var payload = "data";
 
-      var actual = new Message(address.sid, address.sversion, address.verb,
-        payload, headers, 200);
+      var actual = new Message(address.sid, address.verb, address.sversion);
 
       expect(actual).toBeDefined();
       expect(actual.identity).toBeNull();
       expect(actual.protocol).toEqual("ZSS:0.0");
       expect(actual.type).toEqual("REQ");
       expect(actual.address).toEqual(address);
-      expect(actual.headers).toEqual(headers);
-      expect(actual.status).toEqual(200);
-      expect(actual.payload).toEqual(payload);
+      expect(actual.headers).toEqual(null);
+      expect(actual.status).toEqual(null);
+      expect(actual.payload).toEqual(null);
     });
   });
 
