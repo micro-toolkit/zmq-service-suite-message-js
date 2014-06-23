@@ -369,6 +369,31 @@ describe("ZMQService", function(){
       target.run();
     });
 
+    it('logs reply information', function(){
+
+      spyOn(zmq, 'socket').andReturn({
+        send: Function.apply(),
+        on: function(type, callback) {
+          if (type === 'message') {
+            var msg = new Message("SMI", "DOWN");
+            msg.status = 200;
+            msg.type = Message.Type.REP;
+            callback.apply(null, msg.toFrames());
+          }
+        },
+        connect: Function.apply(),
+        close: Function.apply()
+      });
+
+      spyOn(log, 'info');
+
+      var target = new ZMQService(config);
+      target.run();
+
+      expect(log.info).toHaveBeenCalledWith("Reply received from %s:%s with status %s",
+        "SMI", "DOWN", 200);
+    });
+
     describe("with error on execution", function(){
 
       it('returns an error message for invalid sid', function(done) {
