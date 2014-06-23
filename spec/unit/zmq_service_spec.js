@@ -189,7 +189,7 @@ describe("ZMQService", function(){
       };
 
       beforeEach(function(){
-        config.heartbeat = 1000;
+        config.heartbeat = 100;
       });
 
       afterEach(function(){
