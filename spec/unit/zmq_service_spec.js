@@ -23,83 +23,90 @@ describe("ZMQService", function(){
   });
 
   describe("#run", function(){
-    it('connects the zmq socket', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        send: Function.apply(),
-        on: Function.apply(),
-        connect: function(uri) {
-          done();
-        }
-      });
 
-      new ZMQService(config).run();
-    });
-
-    it('connects the zmq socket with linger options set to 0', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        send: Function.apply(),
-        on: Function.apply(),
-        connect: function(uri) {
-          expect(this.linger).toEqual(0);
-          done();
-        }
-      });
-
-      new ZMQService(config).run();
-    });
-
-    it('connects the zmq socket with setted identity', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        send: Function.apply(),
-        on: Function.apply(),
-        connect: function(uri) {
-          expect(this.identity).toEqual("test-zmq#uuid");
-          done();
-        }
-      });
-
-      new ZMQService(config).run();
-    });
-
-    it('connects the zmq socket to the broker instance', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        send: Function.apply(),
-        on: Function.apply(),
-        connect: function(uri) {
-          expect(uri).toEqual("tcp://127.0.0.1:5561");
-          done();
-        }
-      });
-
-      new ZMQService(config).run();
-    });
-
-    it('registers a "message" callback', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        connect: Function.apply(),
-        send: Function.apply(),
-        on: function(type) {
-          if (type === 'message') {
+    describe('connects the zmq socket', function(){
+      it('invoking socket connect', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          send: Function.apply(),
+          on: Function.apply(),
+          connect: function(uri) {
             done();
           }
-        }
+        });
+
+        new ZMQService(config).run();
       });
 
-      new ZMQService(config).run();
-    });
-
-    it('registers a "error" callback', function(done) {
-      spyOn(zmq, 'socket').andReturn({
-        connect: Function.apply(),
-        send: Function.apply(),
-        on: function(type) {
-          if (type === 'error') {
+      it('with linger options set to 0', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          send: Function.apply(),
+          on: Function.apply(),
+          connect: function(uri) {
+            expect(this.linger).toEqual(0);
             done();
           }
-        }
+        });
+
+        new ZMQService(config).run();
       });
 
-      new ZMQService(config).run();
+      it('with setted identity', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          send: Function.apply(),
+          on: Function.apply(),
+          connect: function(uri) {
+            expect(this.identity).toEqual("test-zmq#uuid");
+            done();
+          }
+        });
+
+        new ZMQService(config).run();
+      });
+
+      it('to the broker instance', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          send: Function.apply(),
+          on: Function.apply(),
+          connect: function(uri) {
+            expect(uri).toEqual("tcp://127.0.0.1:5561");
+            done();
+          }
+        });
+
+        new ZMQService(config).run();
+      });
+
+    });
+
+    describe('register callback', function(){
+
+      it('on "message"', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          connect: Function.apply(),
+          send: Function.apply(),
+          on: function(type) {
+            if (type === 'message') {
+              done();
+            }
+          }
+        });
+
+        new ZMQService(config).run();
+      });
+
+      it('on "error"', function(done) {
+        spyOn(zmq, 'socket').andReturn({
+          connect: Function.apply(),
+          send: Function.apply(),
+          on: function(type) {
+            if (type === 'error') {
+              done();
+            }
+          }
+        });
+
+        new ZMQService(config).run();
+      });
     });
 
     describe("send announcement message to broker", function(){
@@ -464,8 +471,6 @@ describe("ZMQService", function(){
         close: Function.apply()
       });
 
-      spyOn(log, 'info');
-
       var target = new ZMQService(config);
       target.run();
 
@@ -554,8 +559,6 @@ describe("ZMQService", function(){
               }
             }
           });
-
-          spyOn(log, 'error');
 
           var target = new ZMQService(config);
           target.run();
