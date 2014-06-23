@@ -301,12 +301,91 @@ describe("ZMQService", function(){
   });
 
   describe("#stop", function(){
+    var isDownMessage = function(frames){
+      var to = msgpack.decode(frames[ADDRESS_FRAME]);
+      var address = {
+        sid: "SMI",
+        sversion: "*",
+        verb: "DOWN"
+      };
+
+      return to.sid === address.sid && to.verb === address.verb;
+    };
+
     it('close the zmq socket', function(done) {
+      var onMessage;
       spyOn(zmq, 'socket').andReturn({
-        send: Function.apply(),
-        on: Function.apply(),
+        send: function(frames){
+          if (isDownMessage(frames)) {
+            var msg = new Message("SMI", "DOWN");
+            msg.status = 200;
+            msg.type = Message.Type.REP;
+            onMessage.apply(null, msg.toFrames());
+          }
+        },
+        on: function(type, callback) {
+          if (type === 'message') {
+            onMessage = callback;
+          }
+        },
         connect: Function.apply(),
         close: function() {
+          done();
+        }
+      });
+
+      var target = new ZMQService(config);
+      target.run();
+
+      target.stop();
+    });
+
+    it('sends down message to broker', function(done) {
+      var address = {
+        sid: "SMI",
+        sversion: "*",
+        verb: "DOWN"
+      };
+
+      spyOn(zmq, 'socket').andReturn({
+        send: function(frames){
+          if(isDownMessage(frames)){
+            expect(msgpack.decode(frames[ADDRESS_FRAME])).toEqual(address);
+            done();
+          }
+        },
+        on: Function.apply(),
+        connect: Function.apply(),
+        close: Function.apply()
+      });
+
+      var target = new ZMQService(config);
+      target.run();
+
+      target.stop();
+    });
+
+    it('send down message before closing socket', function(done) {
+      var downSended = false;
+      var onMessage;
+      spyOn(zmq, 'socket').andReturn({
+        send: function(frames){
+          if (isDownMessage(frames)) {
+            downSended = true;
+            var msg = new Message("SMI", "DOWN");
+            msg.status = 200;
+            msg.type = Message.Type.REP;
+            onMessage.apply(null, msg.toFrames());
+          }
+        },
+        on: function(type, callback) {
+          if (type === 'message') {
+            onMessage = callback;
+          }
+        },
+        connect: Function.apply(),
+        close: function(){
+          expect(downSended).toBeTruthy();
           done();
         }
       });
