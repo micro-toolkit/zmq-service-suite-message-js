@@ -20,6 +20,11 @@ describe("ZMQService", function(){
 
   beforeEach(function(){
     spyOn(uuid, 'v1').andReturn("uuid");
+    spyOn(log, 'trace').andReturn(Function.apply());
+    spyOn(log, 'debug').andReturn(Function.apply());
+    spyOn(log, 'info').andReturn(Function.apply());
+    spyOn(log, 'warn').andReturn(Function.apply());
+    spyOn(log, 'error').andReturn(Function.apply());
   });
 
   describe("#run", function(){
