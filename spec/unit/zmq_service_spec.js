@@ -174,12 +174,12 @@ describe("ZMQService", function(){
         new ZMQService(config).run();
       });
 
-      it("with null payload", function(done){
+      it("with sid on payload", function(done){
         spyOn(zmq, 'socket').andReturn({
           connect: Function.apply(),
           on: Function.apply(),
           send: function(frames) {
-            expect(msgpack.decode(frames[PAYLOAD_FRAME])).toBeFalsy();
+            expect(msgpack.decode(frames[PAYLOAD_FRAME])).toBe(config.sid);
             done();
           }
         });
@@ -309,6 +309,24 @@ describe("ZMQService", function(){
         new ZMQService(config).run();
       });
 
+      it("with sid on payload", function(done){
+        spyOn(zmq, 'socket').andReturn({
+          connect: Function.apply(),
+          on: Function.apply(),
+          send: function(frames) {
+            // discard announcement message
+            if (!isHeartbeat(frames)){
+              return;
+            }
+
+            expect(msgpack.decode(frames[PAYLOAD_FRAME])).toBe(config.sid);
+            done();
+          }
+        });
+
+        new ZMQService(config).run();
+      });
+
     });
   });
 
@@ -352,61 +370,85 @@ describe("ZMQService", function(){
       target.stop();
     });
 
-    it('sends down message to broker', function(done) {
-      var address = {
-        sid: "SMI",
-        sversion: "*",
-        verb: "DOWN"
-      };
+    describe("sends down message to broker", function(){
 
-      spyOn(zmq, 'socket').andReturn({
-        send: function(frames){
-          if(isDownMessage(frames)){
-            expect(msgpack.decode(frames[ADDRESS_FRAME])).toEqual(address);
+      it('on stoping', function(done) {
+        var address = {
+          sid: "SMI",
+          sversion: "*",
+          verb: "DOWN"
+        };
+
+        spyOn(zmq, 'socket').andReturn({
+          send: function(frames){
+            if(isDownMessage(frames)){
+              expect(msgpack.decode(frames[ADDRESS_FRAME])).toEqual(address);
+              done();
+            }
+          },
+          on: Function.apply(),
+          connect: Function.apply(),
+          close: Function.apply()
+        });
+
+        var target = new ZMQService(config);
+        target.run();
+
+        target.stop();
+      });
+
+      it('before closing socket', function(done) {
+        var downSended = false;
+        var onMessage;
+        spyOn(zmq, 'socket').andReturn({
+          send: function(frames){
+            if (isDownMessage(frames)) {
+              downSended = true;
+              var msg = new Message("SMI", "DOWN");
+              msg.status = 200;
+              msg.type = Message.Type.REP;
+              onMessage.apply(null, msg.toFrames());
+            }
+          },
+          on: function(type, callback) {
+            if (type === 'message') {
+              onMessage = callback;
+            }
+          },
+          connect: Function.apply(),
+          close: function(){
+            expect(downSended).toBeTruthy();
             done();
           }
-        },
-        on: Function.apply(),
-        connect: Function.apply(),
-        close: Function.apply()
+        });
+
+        var target = new ZMQService(config);
+        target.run();
+
+        target.stop();
       });
 
-      var target = new ZMQService(config);
-      target.run();
+      it("with sid on payload", function(done){
 
-      target.stop();
-    });
+        spyOn(zmq, 'socket').andReturn({
+          send: function(frames){
+            if(isDownMessage(frames)){
+              expect(msgpack.decode(frames[PAYLOAD_FRAME])).toBe(config.sid);
+              done();
+            }
+          },
+          on: Function.apply(),
+          connect: Function.apply(),
+          close: Function.apply()
+        });
 
-    it('send down message before closing socket', function(done) {
-      var downSended = false;
-      var onMessage;
-      spyOn(zmq, 'socket').andReturn({
-        send: function(frames){
-          if (isDownMessage(frames)) {
-            downSended = true;
-            var msg = new Message("SMI", "DOWN");
-            msg.status = 200;
-            msg.type = Message.Type.REP;
-            onMessage.apply(null, msg.toFrames());
-          }
-        },
-        on: function(type, callback) {
-          if (type === 'message') {
-            onMessage = callback;
-          }
-        },
-        connect: Function.apply(),
-        close: function(){
-          expect(downSended).toBeTruthy();
-          done();
-        }
+        var target = new ZMQService(config);
+        target.run();
+
+        target.stop();
       });
-
-      var target = new ZMQService(config);
-      target.run();
-
-      target.stop();
     });
+
   });
 
   describe("#onMessage", function(){
