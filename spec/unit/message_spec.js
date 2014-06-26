@@ -75,6 +75,36 @@ describe('Message', function() {
         expect(actual.payload).toEqual(payload);
       });
     });
+
+    describe('with buffers', function(){
+
+      it('returns a fullfilled message', function(){
+        var payload = "data";
+        var frames = [
+          new Buffer("identity", 'utf8'),
+          new Buffer("ZSS:0.0", 'utf8'),
+          new Buffer("REP", 'utf8'),
+          new Buffer("RID", 'utf8'),
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          new Buffer(String(200), 'utf8'),
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames);
+
+        expect(actual).toBeDefined();
+        expect(actual.identity).toEqual("identity");
+        expect(actual.protocol).toEqual("ZSS:0.0");
+        expect(actual.type).toEqual("REP");
+        expect(actual.rid).toEqual("RID");
+        expect(actual.address).toEqual(address);
+        expect(actual.headers).toEqual(headers);
+        expect(actual.status).toEqual(200);
+        expect(actual.payload).toEqual(payload);
+      });
+    });
+
   });
 
   describe('#ctor', function(){
