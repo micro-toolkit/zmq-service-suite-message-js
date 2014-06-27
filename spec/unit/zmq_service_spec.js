@@ -5,7 +5,7 @@ describe("ZMQService", function(){
   var _ = require('lodash');
   var msgpack = require('msgpack-js');
   var Message = require('../../lib/message');
-  var log = require('../../lib/logger');
+  var Logger = require('logger-facade-nodejs');
 
   var config = { sid: 'test-zmq', broker: "tcp://127.0.0.1:5561", heartbeat: 10000 };
 
@@ -18,13 +18,12 @@ describe("ZMQService", function(){
       STATUS_FRAME   = 6,
       PAYLOAD_FRAME  = 7;
 
+  var log;
+
   beforeEach(function(){
     spyOn(uuid, 'v1').andReturn("uuid");
-    spyOn(log, 'trace').andReturn(Function.apply());
-    spyOn(log, 'debug').andReturn(Function.apply());
-    spyOn(log, 'info').andReturn(Function.apply());
-    spyOn(log, 'warn').andReturn(Function.apply());
-    spyOn(log, 'error').andReturn(Function.apply());
+    log = Logger.getLogger('ZMQService');
+    spyOn(Logger, 'getLogger').andReturn(log);
   });
 
   describe("#run", function(){
@@ -519,6 +518,7 @@ describe("ZMQService", function(){
       });
 
       var target = new ZMQService(config);
+      spyOn(log, 'info');
       target.run();
 
       expect(log.info).toHaveBeenCalledWith("Reply received from %s:%s with status %s",
@@ -608,6 +608,7 @@ describe("ZMQService", function(){
           });
 
           var target = new ZMQService(config);
+          spyOn(log, 'error');
           target.run();
 
           expect(log.error).toHaveBeenCalledWith("Received zmq error => %s", error.stack);
