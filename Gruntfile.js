@@ -3,6 +3,21 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    bump: {
+      options: {
+        files: ['package.json'],
+        updateConfigs: [],
+        commit: true,
+        commitMessage: 'Release v%VERSION%',
+        commitFiles: ['package.json'],
+        createTag: true,
+        tagName: 'v%VERSION%',
+        tagMessage: 'Version %VERSION%',
+        push: false,
+        gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
+      }
+    },
+
     watch: {
       files: '<%= jshint.files %>',
       tasks: ['jshint', 'unit']
@@ -93,6 +108,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-env');
+  grunt.loadNpmTasks('grunt-bump');
 
   grunt.registerTask('default', ['watch']);
   grunt.registerTask('unit', ['env:test', 'jasmine_node:unit']);
