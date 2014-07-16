@@ -1,5 +1,5 @@
 describe('Message', function() {
-  var Message = require('../../lib/message'),
+  var Message = require('../../message'),
       Buffer = require('buffer').Buffer,
       msgpack = require('msgpack-js');
 
