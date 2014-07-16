@@ -19,7 +19,7 @@ describe('Message', function() {
 
   describe('#parse', function(){
 
-    describe('without identity', function(){
+    describe('without status', function(){
 
       it('returns a fullfilled message', function(){
         var payload = "data";
@@ -29,7 +29,7 @@ describe('Message', function() {
           "RID",
           msgpack.encode(address),
           msgpack.encode(headers),
-          200,
+          null,
           msgpack.encode(payload)
         ];
 
@@ -46,6 +46,34 @@ describe('Message', function() {
         expect(actual.payload).toEqual(payload);
       });
     });
+
+      describe('without identity', function(){
+
+        it('returns a fullfilled message', function(){
+          var payload = "data";
+          var frames = [
+            "ZSS:0.0",
+            "REP",
+            "RID",
+            msgpack.encode(address),
+            msgpack.encode(headers),
+            200,
+            msgpack.encode(payload)
+          ];
+
+          var actual = Message.parse(frames);
+
+          expect(actual).toBeDefined();
+          expect(actual.identity).toBeNull();
+          expect(actual.protocol).toEqual(frames[1]);
+          expect(actual.type).toEqual(frames[2]);
+          expect(actual.rid).toEqual(frames[3]);
+          expect(actual.address).toEqual(address);
+          expect(actual.headers).toEqual(headers);
+          expect(actual.status).toEqual(frames[6]);
+          expect(actual.payload).toEqual(payload);
+        });
+      });
 
     describe('with identity', function(){
 
@@ -157,29 +185,66 @@ describe('Message', function() {
   });
 
   describe('#toFrames', function(){
-    it('returns the message frames', function(){
-      var frames = [
-        "identity",
-        "ZSS:0.0",
-        "REP",
-        "RID",
-        msgpack.encode(address),
-        msgpack.encode(headers),
-        200,
-        msgpack.encode("payload")
-      ];
 
-      var actual = Message.parse(frames).toFrames();
+    describe('with identity', function(){
 
-      expect(actual).toBeDefined();
-      expect(actual[0]).toEqual(frames[0]);
-      expect(actual[1]).toEqual(frames[1]);
-      expect(actual[2]).toEqual(frames[2]);
-      expect(actual[3]).toEqual(frames[3]);
-      expect(msgpack.decode(actual[4])).toEqual(msgpack.decode(frames[4]));
-      expect(msgpack.decode(actual[5])).toEqual(msgpack.decode(frames[5]));
-      expect(actual[6]).toEqual(frames[6]);
-      expect(msgpack.decode(actual[7])).toEqual(msgpack.decode(frames[7]));
+      it('returns the message frames', function(){
+        var frames = [
+          "identity",
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode("payload")
+        ];
+
+        var actual = Message.parse(frames).toFrames();
+
+        expect(actual).toBeDefined();
+        expect(actual[0]).toEqual(frames[0]);
+        expect(actual[1]).toEqual(frames[1]);
+        expect(actual[2]).toEqual(frames[2]);
+        expect(actual[3]).toEqual(frames[3]);
+        expect(msgpack.decode(actual[4])).toEqual(msgpack.decode(frames[4]));
+        expect(msgpack.decode(actual[5])).toEqual(msgpack.decode(frames[5]));
+        expect(actual[6]).toEqual(frames[6]);
+        expect(msgpack.decode(actual[7])).toEqual(msgpack.decode(frames[7]));
+      });
+
     });
+
+    describe('without identity', function(){
+
+      it('returns the message frames', function(){
+        var frames = [
+          null,
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode("payload")
+        ];
+        var msg = Message.parse(frames);
+        msg.identity = null;
+
+        var actual = msg.toFrames();
+
+        expect(actual).toBeDefined();
+        expect(actual[0]).toEqual('');
+        expect(actual[1]).toEqual(frames[1]);
+        expect(actual[2]).toEqual(frames[2]);
+        expect(actual[3]).toEqual(frames[3]);
+        expect(msgpack.decode(actual[4])).toEqual(msgpack.decode(frames[4]));
+        expect(msgpack.decode(actual[5])).toEqual(msgpack.decode(frames[5]));
+        expect(actual[6]).toEqual(frames[6]);
+        expect(msgpack.decode(actual[7])).toEqual(msgpack.decode(frames[7]));
+      });
+
+    });
+
   });
 });
