@@ -18,3 +18,19 @@ This project is a node-js message module representation for [ZMQ Service Suite](
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+## Bump versioning
+
+We use [grunt bump package](https://www.npmjs.org/package/grunt-bump) to control package versioning.
+
+Bump Patch version
+
+    $ grunt bump
+
+Bump Minor version
+
+    $ grunt bump:minor
+
+Bump Major version
+
+    $ grunt bump:major
+
