@@ -9,3 +9,12 @@
 [![NPM version](https://badge.fury.io/js/zmq-service-suite-message.svg)](http://badge.fury.io/js/zmq-service-suite-message)
 
 This project is a node-js message module representation for [ZMQ Service Suite](http://pjanuario.github.io/zmq-service-suite-specs/).
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
