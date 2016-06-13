@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/pjanuario/zmq-service-suite-message-js.svg?branch=master)](https://travis-ci.org/pjanuario/zmq-service-suite-message-js)
-[![Code Climate](https://codeclimate.com/github/pjanuario/zmq-service-suite-message-js.png)](https://codeclimate.com/github/pjanuario/zmq-service-suite-message-js)
-[![Coverage](https://codeclimate.com/github/pjanuario/zmq-service-suite-message-js/coverage.png)](https://codeclimate.com/github/pjanuario/zmq-service-suite-message-js)
-[![Dependency Status](https://gemnasium.com/pjanuario/zmq-service-suite-message-js.svg)](https://gemnasium.com/pjanuario/zmq-service-suite-message-js)
+[![Build Status](https://travis-ci.org/micro-toolkit/zmq-service-suite-message-js.svg?branch=master)](https://travis-ci.org/micro-toolkit/zmq-service-suite-message-js)
+[![Code Climate](https://codeclimate.com/github/micro-toolkit/zmq-service-suite-message-js.png)](https://codeclimate.com/github/micro-toolkit/zmq-service-suite-message-js)
+[![Coverage](https://codeclimate.com/github/micro-toolkit/zmq-service-suite-message-js/coverage.png)](https://codeclimate.com/github/micro-toolkit/zmq-service-suite-message-js)
+[![Dependency Status](https://gemnasium.com/micro-toolkit/zmq-service-suite-message-js.svg)](https://gemnasium.com/micro-toolkit/zmq-service-suite-message-js)
 ![Grunt](https://cdn.gruntjs.com/builtwith.png)
 
 # ZMQ Service Oriented Suite Message Module
