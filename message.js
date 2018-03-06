@@ -3,14 +3,27 @@ var util = require('util'),
     uuid = require('uuid'),
     PROTOCOL_VERSION = 'ZSS:0.0';
 
-var Message = function(sid, verb, sversion){
+function setClient(msg) {
+  var clientParts = !msg.identity ? [null, null] : msg.identity.split('#');
+  msg.client = clientParts[0];
+  msg.clientId = clientParts[1];
+}
+
+function setTransaction(msg) {
+  var reqId = msg.headers ? msg.headers['X-Request-Id'] : null;
+  msg.transaction = reqId || null;
+}
+
+var Message = function(sid, verb, sversion, identity, headers){
   var self = this;
 
   if (!sversion){
     sversion = '*';
   }
 
-  self.identity = null;
+  self.identity = identity || null;
+  setClient(self);
+
   self.protocol = PROTOCOL_VERSION;
   self.type = Message.Type.REQ;
   self.rid = uuid.v1();
@@ -19,7 +32,10 @@ var Message = function(sid, verb, sversion){
     sversion: sversion,
     verb: verb
   };
-  self.headers = null;
+
+  self.headers = headers || null;
+  setTransaction(self);
+
   self.status = null;
   self.payload = null;
 
@@ -49,10 +65,7 @@ Message.parse = function(frames){
   var status = parseInt(frames[6], 10);
 
   msg.identity = identity === '' ? null : identity;
-
-  var clientParts = !msg.identity ? [null, null] : msg.identity.split('#');
-  msg.client = clientParts[0];
-  msg.clientId = clientParts[1];
+  setClient(msg);
 
   msg.protocol = String(frames[1]);
   msg.type = String(frames[2]);
@@ -60,7 +73,7 @@ Message.parse = function(frames){
   msg.address = msgpack.decode(frames[4]);
 
   msg.headers = msgpack.decode(frames[5]);
-  msg.transaction = msg.headers['X-Request-Id'] || null;
+  setTransaction(msg);
 
   msg.status = status ? status : null;
   msg.payload = msgpack.decode(frames[7]);
