@@ -49,6 +49,11 @@ Message.parse = function(frames){
   var status = parseInt(frames[6], 10);
 
   msg.identity = identity === '' ? null : identity;
+
+  var clientParts = !msg.identity ? [null, null] : msg.identity.split('#');
+  msg.client = clientParts[0];
+  msg.clientId = clientParts[1];
+
   msg.protocol = String(frames[1]);
   msg.type = String(frames[2]);
   msg.rid = String(frames[3]);

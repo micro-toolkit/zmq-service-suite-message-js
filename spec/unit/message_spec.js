@@ -102,6 +102,26 @@ describe('Message', function() {
         expect(actual.status).toEqual(frames[6]);
         expect(actual.payload).toEqual(payload);
       });
+
+      it('returns a fullfilled message with client info', function(){
+        var payload = "data";
+        var frames = [
+          "client#1",
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames);
+
+        expect(actual).toBeDefined();
+        expect(actual.client).toEqual("client");
+        expect(actual.clientId).toEqual("1");
+      });
     });
 
     describe('with buffers', function(){
