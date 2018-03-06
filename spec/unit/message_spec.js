@@ -19,6 +19,34 @@ describe('Message', function() {
 
   describe('#parse', function(){
 
+    describe('without payload parse', function(){
+
+      it('returns a fullfilled message', function(){
+        var payload = "data";
+        var frames = [
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          null,
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames, true);
+
+        expect(actual).toBeDefined();
+        expect(actual.identity).toBeNull();
+        expect(actual.protocol).toEqual(frames[1]);
+        expect(actual.type).toEqual(frames[2]);
+        expect(actual.rid).toEqual(frames[3]);
+        expect(actual.address).toEqual(address);
+        expect(actual.headers).toEqual(headers);
+        expect(actual.status).toEqual(frames[6]);
+        expect(actual.payload).toEqual(null);
+      });
+    });
+
     describe('without status', function(){
 
       it('returns a fullfilled message', function(){
