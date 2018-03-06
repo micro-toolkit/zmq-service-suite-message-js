@@ -58,7 +58,10 @@ Message.parse = function(frames){
   msg.type = String(frames[2]);
   msg.rid = String(frames[3]);
   msg.address = msgpack.decode(frames[4]);
+
   msg.headers = msgpack.decode(frames[5]);
+  msg.transaction = msg.headers['X-Request-Id'] || null;
+
   msg.status = status ? status : null;
   msg.payload = msgpack.decode(frames[7]);
   return msg;
