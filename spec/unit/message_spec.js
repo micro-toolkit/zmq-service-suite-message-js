@@ -103,6 +103,50 @@ describe('Message', function() {
         });
       });
 
+
+
+    describe('with micro default transaction id header', function(){
+      it('returns a message with transaction id', function(){
+        var payload = "data";
+        headers = { 'X-Request-Id': "1" };
+        var frames = [
+          "identity",
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames);
+
+        expect(actual).toBeDefined();
+        expect(actual.transaction).toEqual("1");
+      });
+
+      it('returns null transaction when no headers present', function(){
+        var payload = "data";
+        headers = {};
+        var frames = [
+          "identity",
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames);
+
+        expect(actual).toBeDefined();
+        expect(actual.transaction).toBe(null);
+      });
+    });
+
     describe('with identity', function(){
 
       it('returns a fullfilled message', function(){
@@ -129,6 +173,26 @@ describe('Message', function() {
         expect(actual.headers).toEqual(headers);
         expect(actual.status).toEqual(frames[6]);
         expect(actual.payload).toEqual(payload);
+      });
+
+      it('returns a fullfilled message with client info', function(){
+        var payload = "data";
+        var frames = [
+          "client#1",
+          "ZSS:0.0",
+          "REP",
+          "RID",
+          msgpack.encode(address),
+          msgpack.encode(headers),
+          200,
+          msgpack.encode(payload)
+        ];
+
+        var actual = Message.parse(frames);
+
+        expect(actual).toBeDefined();
+        expect(actual.client).toEqual("client");
+        expect(actual.clientId).toEqual("1");
       });
     });
 
