@@ -38,7 +38,7 @@ Message.Type = {
   REP: "REP"
 };
 
-Message.parse = function(frames){
+Message.parse = function(frames, skipPayload){
   var msg = new Message();
 
   if(frames.length === 7) {
@@ -55,7 +55,11 @@ Message.parse = function(frames){
   msg.address = msgpack.decode(frames[4]);
   msg.headers = msgpack.decode(frames[5]);
   msg.status = status ? status : null;
-  msg.payload = msgpack.decode(frames[7]);
+
+  // for performance reason is usefull to allow message parse
+  // allow to parse the message without decode the payload
+  msg.payload = (!skipPayload) ? msgpack.decode(frames[7]) : null;
+
   return msg;
 };
 
