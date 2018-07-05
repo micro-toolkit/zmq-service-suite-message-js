@@ -17,6 +17,9 @@ script:
   - npm test
 after_success:
   - codeclimate < ./coverage/lcov.info
+cache:
+  directories:
+    - "node_modules"
 addons:
   code_climate:
     repo_token:
