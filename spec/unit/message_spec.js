@@ -125,6 +125,25 @@ describe('Message', function() {
         expect(actual).toBeDefined();
         expect(actual.transaction).toEqual("1");
       });
+        it('returns a message with transaction id case insesitive', function(){
+          var payload = "data";
+          headers = { 'X-REQUEST-ID': "1" };
+          var frames = [
+            "identity",
+            "ZSS:0.0",
+            "REP",
+            "RID",
+            msgpack.encode(address),
+            msgpack.encode(headers),
+            200,
+            msgpack.encode(payload)
+          ];
+
+          var actual = Message.parse(frames);
+
+          expect(actual).toBeDefined();
+          expect(actual.transaction).toEqual("1");
+        });
 
       it('returns null transaction when no headers present', function(){
         var payload = "data";
