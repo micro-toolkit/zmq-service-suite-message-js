@@ -10,7 +10,16 @@ function setClient(msg) {
 }
 
 function setTransaction(msg) {
-  var reqId = msg.headers ? msg.headers['X-Request-Id'] : null;
+  var reqId = null;
+
+  if (msg.headers) {
+    var key = Object.keys(msg.headers).find(function(e){
+      return e.toLowerCase() === 'x-request-id';
+    });
+
+    if (key) { reqId = msg.headers[key]; }
+  }
+
   msg.transaction = reqId || null;
 }
 
