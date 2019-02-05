@@ -1,12 +1,10 @@
 language: node_js
 services:
 node_js:
-  - 0.10
-  - 4
   - 6
   - 8
   - 10
-  - node
+  - 11
 before_script:
   - npm install -g grunt-cli
   - npm install -d
